@@ -1,5 +1,5 @@
 <template>
-  <div class="expedition-page" :class="{ 'is-loaded': isLoaded }">
+  <div class="expedition-page" :class="{ 'is-loaded': isLoaded, 'blur': isTaskModalOpen }">
     <header class="header">
       <div class="logo">
         <img src="/зелье без фона.png" alt="Mana" class="mana-icon" />
@@ -38,8 +38,7 @@
           >
             {{ expedition.name }}
             <div class="expedition-actions" v-if="currentExpedition?.id === expedition.id">
-              <img src="/карандаш без фона.png" alt="Edit" class="edit-icon" @click.stop="editExpedition" />
-              <img src="/cancel.png" alt="Delete" class="edit-icon" @click.stop="deleteExpedition" />
+              <img src="/cancel.png" alt="Delete" class="delete-icon" @click.stop="deleteExpedition" />
             </div>
           </button>
           <button class="expedition-item add-expedition" @click="createExpedition">
@@ -48,8 +47,8 @@
         </div>
       </div>
 
-      <div class="main-content" v-if="currentExpedition">
-        <div class="expedition-form">
+      <div class="main-content">
+        <div v-if="currentExpedition" class="expedition-form">
           <div class="form-group">
             <label>Название экспедиции</label>
             <input 
@@ -74,48 +73,63 @@
             </div>
 
             <div class="tasks-grid">
-              <TaskCard 
-                v-for="task in currentExpedition.tasks" 
-                :key="task.id"
-                :task="task"
-                @click="editTask(task)"
-              />
+              <template v-if="currentExpedition.tasks && currentExpedition.tasks.length > 0">
+                <TaskCard 
+                  v-for="task in currentExpedition.tasks" 
+                  :key="task.id"
+                  :task="task"
+                  @click="editTask(task)"
+                />
+              </template>
+              <div v-else class="empty-tasks">
+                Добавь задачи, нажав на плюсик. Воинам нужно чем-то заниматься
+              </div>
             </div>
           </div>
 
-          <button class="save-button" @click="saveExpedition">Сохранить</button>
+          <button class="save-button" @click="saveExpedition">Сформировать отряд</button>
+        </div>
+        <div v-else class="empty-state">
+          Выберите экспедицию или создайте новую
         </div>
       </div>
     </main>
+    <div class="glitter"></div>
+    <div class="nyan-container">
+      <div class="nyan-cat"></div>
+    </div>
   </div>
-  <div class="glitter"></div>
-
-  <div class="nyan-container">
-    <div class="nyan-cat"></div>
-  </div>
+  <TaskModal 
+    v-if="isTaskModalOpen" 
+    @close="isTaskModalOpen = false"
+    @save="handleTaskSave"
+  />
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import TaskCard from '../components/TaskCard.vue'
+import TaskModal from '../components/TaskModal.vue'
 
 const isLoaded = ref(false)
 const isLibrarian = ref(false)
 const currentExpedition = ref(null)
 const expeditions = ref([
-  {
-    id: 1,
-    name: 'Экспедиция 1: Проба пера',
-    description: 'Короче, Меченый, я тебя спас и в благородство играть не буду: выполнишь для меня пару заданий – и мы в расчете.',
-    tasks: [
-      { id: 1, title: 'Task-01 Разработка защитных чар', difficulty: 'Легкий', mana: 9 },
-      { id: 2, title: 'Task-02 Разработка защитных чар', difficulty: 'Легкий', mana: 14 },
-      { id: 3, title: 'Task-03 Разработка защитных чар', difficulty: 'Средний', mana: 21 },
-      { id: 4, title: 'Task-04 Разработка защитных чар', difficulty: 'Средний', mana: 23 },
-      { id: 5, title: 'Task-05 Разработка защитных чар', difficulty: 'Средний', mana: 28 }
-    ]
-  }
+  // {
+  //   id: 1,
+  //   name: 'Экспедиция 1: Проба пера',
+  //   description: 'Короче, Меченый, я тебя спас и в благородство играть не буду: выполнишь для меня пару заданий – и мы в расчете.',
+  //   tasks: [
+  //     { id: 1, title: 'Task-01 Разработка защитных чар', difficulty: 'Легкий', mana: 9 },
+  //     { id: 2, title: 'Task-02 Разработка защитных чар', difficulty: 'Легкий', mana: 14 },
+  //     { id: 3, title: 'Task-03 Разработка защитных чар', difficulty: 'Средний', mana: 21 },
+  //     { id: 4, title: 'Task-04 Разработка защитных чар', difficulty: 'Средний', mana: 23 },
+  //     { id: 5, title: 'Task-05 Разработка защитных чар', difficulty: 'Средний', mana: 28 }
+  //   ]
+  // }
 ])
+
+const isTaskModalOpen = ref(false)
 
 onMounted(() => {
   isLoaded.value = true
@@ -152,13 +166,17 @@ const deleteExpedition = () => {
 }
 
 const addTask = () => {
+  isTaskModalOpen.value = true
+}
+
+const handleTaskSave = (taskData) => {
   if (!currentExpedition.value) return
 
   const newTask = {
     id: currentExpedition.value.tasks.length + 1,
-    title: `Task-${String(currentExpedition.value.tasks.length + 1).padStart(2, '0')} Новая задача`,
-    difficulty: 'Легкий',
-    mana: 0
+    title: taskData.title,
+    description: taskData.description,
+    subtasks: taskData.subtasks
   }
   currentExpedition.value.tasks.push(newTask)
 }
@@ -215,16 +233,16 @@ const saveExpedition = () => {
 /* Нянкет */
 .nyan-cat {
   position: fixed;
-  bottom: -20px; /* Сдвинут выше блесток */
-  left: 0px; /* Сдвинут вправо относительно блесток */
-  width: 100px; /* Размер нянкета */
+  bottom: -20px;
+  left: 0px;
+  width: 100px;
   height: 100px;
-  background-image: url('../../public/nyan-cat.png'); /* Путь к вашему изображению */
+  background-image: url('../../public/nyan-cat.png');
   background-size: contain;
   background-repeat: no-repeat;
-  z-index: 2; /* Выше блесток */
+  z-index: 2;
   pointer-events: none;
-  animation: float 2s infinite ease-in-out; /* Опциональная анимация */
+  transition: background-image 0.15s ease-in-out;
 }
 
 .header {
@@ -250,8 +268,30 @@ const saveExpedition = () => {
   width: 80px;
   height: 80px;
   border-radius: 50%;
+  transition: all 0.15s ease;
 }
 
+.mana-icon:hover {
+  animation: colorShift 1s infinite ease-in-out;
+}
+
+@keyframes colorShift {
+  0% {
+    filter: hue-rotate(0deg) brightness(1.0);
+  }
+  25% {
+    filter: hue-rotate(15deg) brightness(1.2);
+  }
+  50% {
+    filter: hue-rotate(-15deg) brightness(1.1);
+  }
+  75% {
+    filter: hue-rotate(10deg) brightness(1.2);
+  }
+  100% {
+    filter: hue-rotate(0deg) brightness(1.0);
+  }
+}
 
 h3 {
   font-size: 2rem;
@@ -405,6 +445,7 @@ input:checked + .slider:before {
   align-items: center;
   font-family: 'Pixelizer', sans-serif;
   width: 100%;
+  position: relative;
 }
 
 .expedition-item:hover {
@@ -416,19 +457,15 @@ input:checked + .slider:before {
 }
 
 .expedition-actions {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
+  position: absolute;
+  top: -8px;
+  right: -8px;
 }
 
-.edit-icon {
-  width: 16px;
-  height: 16px;
+.delete-icon {
+  width: 20px;
+  height: 20px;
   cursor: pointer;
-}
-
-.edit-icon:hover {
-  opacity: 0.8;
 }
 
 .add-expedition {
@@ -475,9 +512,10 @@ textarea.input-field {
 
 .tasks-header {
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   align-items: center;
   margin-bottom: 1rem;
+  gap: 1rem;
 }
 
 .add-task {
@@ -505,6 +543,17 @@ textarea.input-field {
   gap: 1rem;
 }
 
+.empty-tasks {
+  text-align: center;
+  padding: 2rem;
+  color: var(--primary-light);
+  font-size: 1.2rem;
+  opacity: 0.8;
+  grid-column: 1 / -1;
+  background: rgba(139, 111, 255, 0.1);
+  border-radius: 1rem;
+}
+
 .save-button {
   background: var(--primary-color);
   color: white;
@@ -519,5 +568,18 @@ textarea.input-field {
 
 .save-button:hover {
   background: var(--primary-light);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--primary-light);
+  font-size: 1.5rem;
+}
+
+.blur {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
 }
 </style> 
