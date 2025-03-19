@@ -88,6 +88,11 @@
       </div>
     </main>
   </div>
+  <div class="glitter"></div>
+
+  <div class="nyan-container">
+    <div class="nyan-cat"></div>
+  </div>
 </template>
 
 <script setup>
@@ -182,6 +187,46 @@ const saveExpedition = () => {
   flex-direction: column;
 }
 
+.glitter {
+  position: fixed; /* Фиксированное положение относительно экрана */
+  bottom: -20px; /* Отступ снизу */
+  width: 350px; /* Ширина блесток */
+  height: 350px; /* Высота блесток */
+  background-image: url('/блестки.png');
+  background-size: contain; /* Сохраняет пропорции изображения */
+  background-repeat: no-repeat;
+  z-index: 1; /* Чтобы блестки не перекрывали важные элементы */
+  pointer-events: none; /* Клики проходят сквозь элемент */
+}
+
+.nyan-container {
+  position: fixed;
+  bottom: -20px;
+  left: 0px;
+  width: 100px;
+  height: 100px;
+  pointer-events: auto; /* Включаем взаимодействие для контейнера */
+}
+
+.nyan-container:hover .nyan-cat {
+  background-image: url('../../public/nyan-cat2.webp');
+}
+
+/* Нянкет */
+.nyan-cat {
+  position: fixed;
+  bottom: -20px; /* Сдвинут выше блесток */
+  left: 0px; /* Сдвинут вправо относительно блесток */
+  width: 100px; /* Размер нянкета */
+  height: 100px;
+  background-image: url('../../public/nyan-cat.png'); /* Путь к вашему изображению */
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 2; /* Выше блесток */
+  pointer-events: none;
+  animation: float 2s infinite ease-in-out; /* Опциональная анимация */
+}
+
 .header {
   background: var(--primary-color);
   padding: 1.5rem 2rem;
@@ -207,6 +252,17 @@ const saveExpedition = () => {
   border-radius: 50%;
 }
 
+
+h3 {
+  font-size: 2rem;
+  color: var(--primary-light);
+}
+
+label {
+  font-size: 2rem;
+  color: var(--primary-light);
+}
+
 .logo-text {
   display: flex;
   flex-direction: column;
@@ -215,7 +271,7 @@ const saveExpedition = () => {
 
 .logo-text h1 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 
 .logo-text p {
@@ -337,6 +393,7 @@ input:checked + .slider:before {
 
 .expedition-item {
   background: transparent;
+  font-size: 1rem;
   border: none;
   color: white;
   padding: 0.5rem 1rem;
@@ -380,7 +437,7 @@ input:checked + .slider:before {
 
 .main-content {
   flex: 1;
-  background: rgba(107, 78, 230, 0.1);
+  background: white;
   padding: 2rem;
   border-radius: 1rem;
   height: 100%;
@@ -397,12 +454,13 @@ input:checked + .slider:before {
 }
 
 .input-field {
+  font-size: 1.25rem;
   width: 100%;
   padding: 0.75rem;
   background: rgba(139, 111, 255, 0.1);
   border: 1px solid var(--primary-color);
   border-radius: 0.5rem;
-  color: white;
+  color: var(--text-color-dark);
   font-family: 'Pixelizer', sans-serif;
 }
 

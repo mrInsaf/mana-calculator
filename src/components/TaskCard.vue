@@ -38,7 +38,7 @@ defineProps({
 .task-card h4 {
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
-  color: var(--text-color);
+  color: var(--text-color-dark);
 }
 
 .task-info {
@@ -52,7 +52,7 @@ defineProps({
 }
 
 .mana {
-  color: var(--text-color);
+  color: var(--primary-light);
   opacity: 0.8;
 }
 </style> 
