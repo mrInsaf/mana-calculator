@@ -220,6 +220,7 @@ input:checked + .slider:before {
 }
 
 .main-container {
+  background: var(--background-light);
   flex: 1;
   padding: 2rem;
   height: calc(100vh - 120px);

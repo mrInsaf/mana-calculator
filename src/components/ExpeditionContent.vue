@@ -214,7 +214,7 @@ const saveExpedition = () => {
 .main-content {
   flex: 1;
   padding: 2rem;
-  background: rgba(139, 111, 255, 0.15);
+  background: var(--container-background);
   border-radius: 1rem;
   height: 100%;
   overflow-y: auto;
@@ -234,10 +234,10 @@ const saveExpedition = () => {
 .input-field {
   width: 100%;
   padding: 0.75rem;
-  background: var(--primary-color);
+  background: rgba(139, 111, 255, 0.1);
   border: none;
   border-radius: 0.5rem;
-  color: white;
+  color: var(--text-color-dark);
   font-family: 'Pixelizer', sans-serif;
   font-size: 1rem;
 }
