@@ -112,7 +112,7 @@ import TaskCard from '../components/TaskCard.vue'
 import TaskModal from '../components/TaskModal.vue'
 
 const isLoaded = ref(false)
-const isLibrarian = ref(false)
+const isLibrarian = ref(true)
 const currentExpedition = ref(null)
 const expeditions = ref([
   // {
