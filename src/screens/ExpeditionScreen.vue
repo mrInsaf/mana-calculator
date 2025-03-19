@@ -229,8 +229,8 @@ input:checked + .slider:before {
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
   background: url('/блестки.png') no-repeat center/contain;
   pointer-events: none;
   z-index: 1;
@@ -240,20 +240,24 @@ input:checked + .slider:before {
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 200px;
-  height: 200px;
-  pointer-events: none;
+  width: 100px;
+  height: 100px;
+  pointer-events: auto;
   z-index: 2;
 }
 
 .nyan-cat {
   width: 100px;
   height: 100px;
-  background: url('/нян.png') no-repeat center/contain;
+  background: url('../../public/nyan-cat.png') no-repeat center/contain;
   position: absolute;
-  left: 50px;
-  bottom: 50px;
-  animation: float 3s ease-in-out infinite;
+  left: 0px;
+  bottom: 0px;
+  pointer-events: none;
+}
+
+.nyan-container:hover .nyan-cat {
+  background-image: url('../../public/nyan-cat2.webp');
 }
 
 @keyframes float {
