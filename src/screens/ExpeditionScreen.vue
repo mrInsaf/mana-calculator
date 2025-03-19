@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, provide } from 'vue'
 import ExpeditionContent from '../components/ExpeditionContent.vue'
 import GrimuarContent from '../components/GrimuarContent.vue'
 
@@ -49,6 +49,14 @@ onMounted(() => {
     isLoaded.value = true
   }, 100)
 })
+
+// Обработчик события открытия/закрытия модального окна
+const handleModalState = (isOpen) => {
+  isModalOpen.value = isOpen
+}
+
+// Предоставляем обработчик дочерним компонентам
+provide('handleModalState', handleModalState)
 </script>
 
 <style scoped>

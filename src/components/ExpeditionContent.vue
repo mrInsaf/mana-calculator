@@ -1,5 +1,5 @@
 <template>
-  <div class="expedition-content">
+  <div class="expedition-content" :class="{ 'blur': isModalOpen }">
     <div class="sidebar">
       <h3>Хроника</h3>
       <div class="expedition-list">
@@ -69,14 +69,14 @@
     </div>
   </div>
   <TaskModal 
-    v-if="isTaskModalOpen" 
-    @close="isTaskModalOpen = false"
+    v-if="isModalOpen" 
+    @close="isModalOpen = false"
     @save="handleTaskSave"
   />
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import TaskCard from './TaskCard.vue'
 import TaskModal from './TaskModal.vue'
 
@@ -96,7 +96,7 @@ const expeditions = ref([
   }
 ])
 
-const isTaskModalOpen = ref(false)
+const isModalOpen = ref(false)
 
 const selectExpedition = (expedition) => {
   currentExpedition.value = expedition
@@ -124,7 +124,7 @@ const deleteExpedition = () => {
 }
 
 const addTask = () => {
-  isTaskModalOpen.value = true
+  isModalOpen.value = true
 }
 
 const handleTaskSave = (taskData) => {
@@ -313,5 +313,11 @@ h3 {
   padding: 2rem;
   color: var(--primary-light);
   font-size: 1.5rem;
+}
+
+.blur {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
 }
 </style> 

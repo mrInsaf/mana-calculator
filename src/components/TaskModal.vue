@@ -1,5 +1,5 @@
 <template>
-  <div class="modal-overlay" @click.self="$emit('close')">
+  <div class="modal-overlay" @click.self="closeModal">
     <div class="modal-content">
       <div class="form-group">
         <label>Название задачи</label>
@@ -64,7 +64,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const emit = defineEmits(['close', 'save'])
 
@@ -72,6 +72,24 @@ const taskData = ref({
   title: '',
   description: '',
   subtasks: []
+})
+
+const closeModal = () => {
+  emit('close')
+}
+
+const handleEscape = (e) => {
+  if (e.key === 'Escape') {
+    closeModal()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleEscape)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleEscape)
 })
 
 const addSubtask = () => {
@@ -87,7 +105,7 @@ const addSubtask = () => {
 
 const save = () => {
   emit('save', taskData.value)
-  emit('close')
+  closeModal()
 }
 </script>
 
