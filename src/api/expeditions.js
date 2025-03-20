@@ -71,7 +71,7 @@ export const expeditionsApi = {
       console.log('Запрашиваем подзадачи для задачи:', idTask)
       const { data } = await api.get(`/expedition/task/subtasks`, {
         params: {
-          idTask
+          idtask: idTask
         }
       })
       console.log('Ответ от сервера:', data)
