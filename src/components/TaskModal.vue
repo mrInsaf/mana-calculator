@@ -199,7 +199,7 @@ textarea.input-field {
 
 .table-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 0.7fr 0.7fr 0.7fr;
   gap: 0.5rem;
   padding: 1rem;
   background: var(--primary-color);
@@ -210,7 +210,7 @@ textarea.input-field {
 
 .table-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 0.7fr 0.7fr 0.7fr;
   gap: 0.5rem;
   padding: 0.5rem;
   border-bottom: 1px solid rgba(139, 111, 255, 0.2);
@@ -221,21 +221,23 @@ textarea.input-field {
   border: 1px solid var(--primary-color);
   border-radius: 0.25rem;
   padding: 0.5rem;
-  color: white;
+  color: var(--text-color-dark);
   font-family: 'Pixelizer', sans-serif;
   font-size: 0.9rem;
 }
 
 .subtask-input.number {
   text-align: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .subtask-select {
   background: transparent;
-  border: 1px solid var(--primary-color);
+  border: 1px solid var(--text-color-dark);
   border-radius: 0.25rem;
   padding: 0.5rem;
-  color: white;
+  color: var(--text-color-dark);
   font-family: 'Pixelizer', sans-serif;
   font-size: 0.9rem;
 }
