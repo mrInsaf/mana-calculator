@@ -1,11 +1,17 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:7272',
+  baseURL: 'http://localhost:7070',
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'X-User-Role': '1' // По умолчанию роль мастера
   }
 })
+
+// Функция для обновления роли
+const updateUserRole = (isLibrarian) => {
+  api.defaults.headers['X-User-Role'] = isLibrarian ? '2' : '1'
+}
 
 // Интерцептор для обработки ответов
 api.interceptors.response.use(
@@ -17,4 +23,4 @@ api.interceptors.response.use(
   }
 )
 
-export default api 
+export { api as default, updateUserRole } 
