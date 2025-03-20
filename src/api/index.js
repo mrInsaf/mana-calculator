@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:7070',
+  baseURL: 'http://localhost:7070',  // Убедитесь, что порт совпадает с портом вашего сервера
   headers: {
     'Content-Type': 'application/json',
     'X-User-Role': '1' // По умолчанию роль мастера
@@ -19,6 +19,13 @@ api.interceptors.response.use(
   error => {
     // Обработка ошибок
     console.error('API Error:', error.response?.data || error.message)
+    if (error.response) {
+      console.log('Статус ответа:', error.response.status)
+      console.log('Данные ответа:', error.response.data)
+    } else if (error.request) {
+      console.log('Запрос был сделан, но ответ не получен')
+      console.log('Детали запроса:', error.request)
+    }
     return Promise.reject(error)
   }
 )

@@ -18,6 +18,16 @@
         ></textarea>
       </div>
 
+      <div class="form-actions">
+        <button 
+          class="create-task-button" 
+          @click="createTask"
+          :disabled="!taskData.title || !taskData.description"
+        >
+          Создать задачу
+        </button>
+      </div>
+
       <div class="subtasks-section">
         <div class="subtasks-header">
           <h3>Подзадачи</h3>
@@ -38,20 +48,12 @@
             :key="index" 
             class="table-row"
           >
-            <input type="text" v-model="subtask.name" class="subtask-input" />
-            <select v-model="subtask.level" class="subtask-select">
-              <option>Лёгкий</option>
-              <option>Средний</option>
-              <option>Сложный</option>
-            </select>
-            <select v-model="subtask.type" class="subtask-select">
-              <option>Изменение</option>
-              <option>Поиск</option>
-              <option>Создание</option>
-            </select>
-            <input type="number" v-model="subtask.strategy" class="subtask-input number" />
-            <input type="number" v-model="subtask.magic" class="subtask-input number" />
-            <input type="number" v-model="subtask.combat" class="subtask-input number" />
+            <div>{{ subtask.name }}</div>
+            <div>{{ subtask.level }}</div>
+            <div>{{ subtask.type }}</div>
+            <div>{{ subtask.strategy }}</div>
+            <div>{{ subtask.magic }}</div>
+            <div>{{ subtask.combat }}</div>
           </div>
         </div>
       </div>
@@ -77,7 +79,7 @@
       </div>
 
       <div class="modal-actions">
-        <button class="save-button" @click="save">Сохранить</button>
+        <button class="save-button" @click="save" :disabled="!taskData.id">Сохранить</button>
       </div>
     </div>
   </div>
@@ -88,6 +90,13 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { expeditionsApi } from '../api/expeditions'
 
 const emit = defineEmits(['close', 'save'])
+
+const props = defineProps({
+  expeditionId: {
+    type: Number,
+    required: true
+  }
+})
 
 const taskData = ref({
   title: '',
@@ -130,20 +139,47 @@ const addSubtask = async () => {
   }
 }
 
-const selectBacklogTask = (backlogTask) => {
-  taskData.value.subtasks.push({
-    name: backlogTask.name,
-    type: backlogTask.type,
-    difficult: backlogTask.difficult,
-    strategy: backlogTask.manaStrat,
-    magic: backlogTask.manaMagic,
-    combat: backlogTask.manaBattle,
-    checked: false
-  })
-  showBacklog.value = false
+const selectBacklogTask = async (backlogTask) => {
+  try {
+    console.log('Добавляем подзадачу из бэклога:', backlogTask)
+    const result = await expeditionsApi.addSubtaskFromBacklog(taskData.value.id, backlogTask.id)
+    console.log('Подзадача успешно добавлена:', result)
+    
+    taskData.value.subtasks.push({
+      name: backlogTask.name,
+      type: backlogTask.type,
+      difficult: backlogTask.difficult,
+      strategy: backlogTask.manaStrat,
+      magic: backlogTask.manaMagic,
+      combat: backlogTask.manaBattle,
+      checked: false
+    })
+    showBacklog.value = false
+  } catch (error) {
+    console.error('Ошибка при добавлении подзадачи:', error)
+    // Можно добавить отображение ошибки пользователю
+  }
+}
+
+const createTask = async () => {
+  try {
+    const result = await expeditionsApi.createTask({
+      idExpedition: props.expeditionId,
+      name: taskData.value.title,
+      description: taskData.value.description
+    })
+    console.log('Задача создана:', result)
+    taskData.value.id = result.id
+  } catch (error) {
+    console.error('Ошибка при создании задачи:', error)
+  }
 }
 
 const save = () => {
+  if (!taskData.value.id) {
+    console.warn('Нельзя сохранить подзадачи без создания задачи')
+    return
+  }
   emit('save', taskData.value)
   closeModal()
 }
@@ -209,6 +245,36 @@ textarea.input-field {
   resize: vertical;
 }
 
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 1rem 0;
+}
+
+.create-task-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-family: 'Pixelizer', sans-serif;
+}
+
+.create-task-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.create-task-button:not(:disabled):hover {
+  background: var(--primary-light);
+}
+
+.save-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
 .subtasks-header {
   display: flex;
   align-items: center;
@@ -248,12 +314,32 @@ textarea.input-field {
   font-family: 'Pixelizer', sans-serif;
 }
 
+.table-header > div {
+  text-align: center;
+}
+
+.table-header > div:first-child {
+  text-align: left;
+}
+
 .table-row {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
   gap: 0.5rem;
   padding: 0.5rem;
   border-bottom: 1px solid rgba(139, 111, 255, 0.2);
+}
+
+.table-row > div {
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--text-color-dark);
+}
+
+.table-row > div:not(:first-child) {
+  justify-content: center;
 }
 
 .subtask-input {
@@ -305,7 +391,7 @@ textarea.input-field {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: white;
+  background: var(--container-background);
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -314,15 +400,28 @@ textarea.input-field {
   width: 90%;
   max-width: 800px;
   z-index: 1000;
+  color: var(--text-color-dark);
+}
+
+.backlog-list h3 {
+  color: var(--primary-light);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
 }
 
 .backlog-list .table-row {
   cursor: pointer;
   transition: background-color 0.2s;
+  color: var(--text-color-dark);
 }
 
 .backlog-list .table-row:hover {
   background-color: rgba(139, 111, 255, 0.1);
+}
+
+.backlog-list .table-header {
+  background: var(--primary-color);
+  color: white;
 }
 </style>
 

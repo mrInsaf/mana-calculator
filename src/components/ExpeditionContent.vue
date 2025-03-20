@@ -40,6 +40,26 @@
           ></textarea>
         </div>
 
+        <div class="form-actions">
+          <button 
+            class="create-expedition-button" 
+            @click="saveExpedition"
+            :disabled="!currentExpedition.name || !currentExpedition.description"
+          >
+            Сохранить экспедицию
+          </button>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            class="squad-button" 
+            @click="openSquadModal"
+            :disabled="!currentExpedition.id"
+          >
+            Сформировать отряд
+          </button>
+        </div>
+
         <div class="tasks-section">
           <div class="tasks-header">
             <h3>Список задач</h3>
@@ -60,8 +80,6 @@
             </div>
           </div>
         </div>
-
-        <button class="save-button" @click="saveExpedition">Сформировать отряд</button>
       </div>
       <div v-else class="empty-state">
         Выберите экспедицию или создайте новую
@@ -70,6 +88,7 @@
   </div>
   <TaskModal 
     v-if="isModalOpen" 
+    :expedition-id="currentExpedition.id"
     @close="isModalOpen = false"
     @save="handleTaskSave"
   />
@@ -109,14 +128,30 @@ const selectExpedition = async (expedition) => {
 }
 
 const createExpedition = () => {
-  const newExpedition = {
-    id: expeditions.value.length + 1,
-    name: `Экспедиция ${expeditions.value.length + 1}`,
+  currentExpedition.value = {
+    name: '',
     description: '',
     tasks: []
   }
-  expeditions.value.push(newExpedition)
-  currentExpedition.value = newExpedition
+}
+
+const saveExpedition = async () => {
+  try {
+    const result = await expeditionsApi.create({
+      name: currentExpedition.value.name,
+      description: currentExpedition.value.description
+    })
+    console.log('Экспедиция создана:', result)
+    currentExpedition.value.id = result.id
+    // Добавляем новую экспедицию в список
+    expeditions.value.push({
+      id: result.id,
+      name: currentExpedition.value.name,
+      description: currentExpedition.value.description
+    })
+  } catch (error) {
+    console.error('Ошибка при создании экспедиции:', error)
+  }
 }
 
 const deleteExpedition = async () => {
@@ -135,6 +170,10 @@ const deleteExpedition = async () => {
 }
 
 const addTask = () => {
+  if (!currentExpedition.value?.id) {
+    console.warn('Нельзя добавить задачу без создания экспедиции')
+    return
+  }
   isModalOpen.value = true
 }
 
@@ -157,15 +196,8 @@ const editTask = (task) => {
   // TODO: Implement task editing
 }
 
-const saveExpedition = async () => {
-  if (!currentExpedition.value) return
-
-  try {
-    await expeditionsApi.update(currentExpedition.value.id, currentExpedition.value)
-    console.log('Экспедиция сохранена')
-  } catch (error) {
-    console.error('Ошибка при сохранении экспедиции:', error)
-  }
+const openSquadModal = () => {
+  // TODO: Implement squad modal opening logic
 }
 </script>
 
@@ -268,6 +300,50 @@ textarea.input-field {
   resize: vertical;
 }
 
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 1rem 0;
+}
+
+.create-expedition-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-family: 'Pixelizer', sans-serif;
+}
+
+.create-expedition-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.create-expedition-button:not(:disabled):hover {
+  background: var(--primary-light);
+}
+
+.squad-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-family: 'Pixelizer', sans-serif;
+}
+
+.squad-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.squad-button:not(:disabled):hover {
+  background: var(--primary-light);
+}
+
 .tasks-section {
   margin-top: 2rem;
 }
@@ -315,18 +391,6 @@ h3 {
   grid-column: 1 / -1;
   background: rgba(139, 111, 255, 0.1);
   border-radius: 1rem;
-}
-
-.save-button {
-  background: var(--primary-light);
-  color: white;
-  border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-family: 'Pixelizer', sans-serif;
-  margin-top: 2rem;
-  float: right;
 }
 
 .empty-state {

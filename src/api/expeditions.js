@@ -13,6 +13,15 @@ export const expeditionsApi = {
   getBacklog: () => api.get('/backlog'),
 
   /**
+   * Добавить подзадачу из бэклога к задаче
+   * @param {number} idTask - ID задачи
+   * @param {number} backlogId - ID задачи из бэклога
+   * @returns {Promise<Object>} Добавленная подзадача
+   */
+  addSubtaskFromBacklog: (idTask, backlogId) => 
+    api.post(`/expedition/task/subtask?idTask=${idTask}&backlogId=${backlogId}`),
+
+  /**
    * Получить экспедицию по ID
    * @param {number} id - ID экспедиции
    */
@@ -24,7 +33,7 @@ export const expeditionsApi = {
    * @param {string} data.name - Название экспедиции
    * @param {string} data.description - Описание экспедиции
    */
-  create: (data) => api.post('/expeditions', data),
+  create: (data) => api.post(`/expeditions?name=${encodeURIComponent(data.name)}&description=${encodeURIComponent(data.description)}`),
 
   /**
    * Обновить экспедицию
@@ -43,5 +52,16 @@ export const expeditionsApi = {
    * Получить задачи экспедиции
    * @param {number} id - ID экспедиции
    */
-  getTasks: (id) => api.get(`/expeditions/${id}/tasks`)
+  getTasks: (id) => api.get(`/expeditions/${id}/tasks`),
+
+  /**
+   * Создать новую задачу
+   * @param {Object} params - Параметры задачи
+   * @param {number} params.idExpedition - ID экспедиции
+   * @param {string} params.name - Название задачи
+   * @param {string} params.description - Описание задачи
+   * @returns {Promise<Object>} Созданная задача
+   */
+  createTask: ({ idExpedition, name, description }) => 
+    api.post(`/expedition/task?idExpedition=${idExpedition}&name=${encodeURIComponent(name)}&description=${encodeURIComponent(description)}`)
 } 
