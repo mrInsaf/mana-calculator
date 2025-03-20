@@ -22,7 +22,7 @@ const heroes = [
   {
     name: 'Техномаг',
     level: 1,
-    image: '/heroes/technomage.png',
+    image: '../../public/маг.png',
     strategy: 1,
     magic: 6,
     combat: 3,
