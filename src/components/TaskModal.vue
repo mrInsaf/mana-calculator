@@ -5,7 +5,7 @@
         <label>Название задачи</label>
         <input 
           type="text" 
-          v-model="taskData.title" 
+          v-model="taskData.name" 
           class="input-field"
         />
       </div>
@@ -22,7 +22,7 @@
         <button 
           class="create-task-button" 
           @click="createTask"
-          :disabled="!taskData.title || !taskData.description"
+          :disabled="!taskData.name || !taskData.description"
         >
           Создать задачу
         </button>
@@ -99,7 +99,7 @@ const props = defineProps({
 })
 
 const taskData = ref({
-  title: '',
+  name: '',
   description: '',
   subtasks: []
 })
@@ -165,7 +165,7 @@ const createTask = async () => {
   try {
     const result = await expeditionsApi.createTask({
       idExpedition: props.expeditionId,
-      name: taskData.value.title,
+      name: taskData.value.name,
       description: taskData.value.description
     })
     console.log('Задача создана:', result)

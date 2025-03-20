@@ -185,8 +185,14 @@ const handleTaskSave = async (taskData) => {
       ...taskData,
       expeditionId: currentExpedition.value.id
     }
-    const savedTask = await tasksApi.create(newTask)
-    currentExpedition.value.tasks.push(savedTask)
+    await tasksApi.create(newTask)
+    
+    // Получаем обновленный список задач
+    const updatedTasks = await expeditionsApi.getTasks(currentExpedition.value.id)
+    console.log('Обновленный список задач:', updatedTasks)
+    currentExpedition.value.tasks = updatedTasks
+    
+    isModalOpen.value = false
   } catch (error) {
     console.error('Ошибка при сохранении задачи:', error)
   }

@@ -1,4 +1,5 @@
 import api from './index'
+import axios from 'axios'
 
 export const expeditionsApi = {
   /**
@@ -44,15 +45,15 @@ export const expeditionsApi = {
 
   /**
    * Удалить экспедицию
-   * @param {number} id - ID экспедиции
+   * @param {number} idExpedition - ID экспедиции
    */
-  delete: (id) => api.delete(`/expeditions/${id}`),
+  delete: (idExpedition) => api.delete(`/expedition?idExpedition=${idExpedition}`),
 
   /**
    * Получить задачи экспедиции
    * @param {number} id - ID экспедиции
    */
-  getTasks: (id) => api.get(`/expeditions/${id}/tasks`),
+  getTasks: (id) => api.get(`/expedition/tasks?idExpedition=${id}`),
 
   /**
    * Создать новую задачу
@@ -63,5 +64,21 @@ export const expeditionsApi = {
    * @returns {Promise<Object>} Созданная задача
    */
   createTask: ({ idExpedition, name, description }) => 
-    api.post(`/expedition/task?idExpedition=${idExpedition}&name=${encodeURIComponent(name)}&description=${encodeURIComponent(description)}`)
+    api.post(`/expedition/task?idExpedition=${idExpedition}&name=${encodeURIComponent(name)}&description=${encodeURIComponent(description)}`),
+
+  async getTaskSubtasks(idTask) {
+    try {
+      console.log('Запрашиваем подзадачи для задачи:', idTask)
+      const { data } = await api.get(`/expedition/task/subtasks`, {
+        params: {
+          idTask
+        }
+      })
+      console.log('Ответ от сервера:', data)
+      return data || []
+    } catch (error) {
+      console.error('Ошибка при получении подзадач:', error)
+      return []
+    }
+  },
 } 
