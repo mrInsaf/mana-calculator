@@ -56,6 +56,26 @@
         </div>
       </div>
 
+      <div v-if="showBacklog" class="backlog-list">
+        <h3>Список подзадач</h3>
+        <div class="table-header">
+          <div>Название</div>
+          <div>Уровень</div>
+          <div>Тип</div>
+          <div>Стратегия</div>
+          <div>Магия</div>
+          <div>Бой</div>
+        </div>
+        <div v-for="backlogTask in backlogTasks" :key="backlogTask.id" class="table-row" @click="selectBacklogTask(backlogTask)">
+          <div>{{ backlogTask.name }}</div>
+          <div>{{ backlogTask.difficult }}</div>
+          <div>{{ backlogTask.type }}</div>
+          <div>{{ backlogTask.manaStrat }}</div>
+          <div>{{ backlogTask.manaMagic }}</div>
+          <div>{{ backlogTask.manaBattle }}</div>
+        </div>
+      </div>
+
       <div class="modal-actions">
         <button class="save-button" @click="save">Сохранить</button>
       </div>
@@ -65,6 +85,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { expeditionsApi } from '../api/expeditions'
 
 const emit = defineEmits(['close', 'save'])
 
@@ -73,6 +94,9 @@ const taskData = ref({
   description: '',
   subtasks: []
 })
+
+const backlogTasks = ref([])
+const showBacklog = ref(false)
 
 const closeModal = () => {
   emit('close')
@@ -92,15 +116,31 @@ onUnmounted(() => {
   document.removeEventListener('keydown', handleEscape)
 })
 
-const addSubtask = () => {
+const addSubtask = async () => {
+  showBacklog.value = true
+  try {
+    console.log('Загружаем список подзадач из бэклога...')
+    backlogTasks.value = await expeditionsApi.getBacklog()
+    console.log('Полученные подзадачи из бэклога:', backlogTasks.value)
+    console.log('URL запроса:', expeditionsApi.getBacklog.toString())
+  } catch (error) {
+    console.error('Ошибка при загрузке бэклога:', error)
+    console.log('Детали запроса:', error.config)
+    console.log('Заголовки запроса:', error.config?.headers)
+  }
+}
+
+const selectBacklogTask = (backlogTask) => {
   taskData.value.subtasks.push({
-    name: '',
-    level: 'Лёгкий',
-    type: 'Изменение',
-    strategy: 0,
-    magic: 0,
-    combat: 0
+    name: backlogTask.name,
+    type: backlogTask.type,
+    difficult: backlogTask.difficult,
+    strategy: backlogTask.manaStrat,
+    magic: backlogTask.manaMagic,
+    combat: backlogTask.manaBattle,
+    checked: false
   })
+  showBacklog.value = false
 }
 
 const save = () => {
@@ -258,6 +298,31 @@ textarea.input-field {
 
 .save-button:hover {
   background: var(--primary-light);
+}
+
+.backlog-list {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-height: 80vh;
+  overflow-y: auto;
+  width: 90%;
+  max-width: 800px;
+  z-index: 1000;
+}
+
+.backlog-list .table-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.backlog-list .table-row:hover {
+  background-color: rgba(139, 111, 255, 0.1);
 }
 </style>
 
