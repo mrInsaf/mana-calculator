@@ -76,27 +76,25 @@
 </template>
 
 <script setup>
-import { ref, inject } from 'vue'
+import { ref, inject, onMounted } from 'vue'
 import TaskCard from './TaskCard.vue'
 import TaskModal from './TaskModal.vue'
+import { expeditionsApi } from '../api/expeditions'
 
 const currentExpedition = ref(null)
-const expeditions = ref([
-  {
-    id: 1,
-    name: 'Экспедиция 1: Проба пера',
-    description: 'Короче, Меченый, я тебя спас и в благородство играть не буду: выполнишь для меня пару заданий – и мы в расчете.',
-    tasks: [
-      { id: 1, title: 'Task-01 Разработка защитных чар', difficulty: 'Легкий', mana: 9 },
-      { id: 2, title: 'Task-02 Разработка защитных чар', difficulty: 'Легкий', mana: 14 },
-      { id: 3, title: 'Task-03 Разработка защитных чар', difficulty: 'Средний', mana: 21 },
-      { id: 4, title: 'Task-04 Разработка защитных чар', difficulty: 'Средний', mana: 23 },
-      { id: 5, title: 'Task-05 Разработка защитных чар', difficulty: 'Средний', mana: 28 }
-    ]
-  }
-])
-
+const expeditions = ref([])
 const isModalOpen = ref(false)
+
+// Загрузка экспедиций при монтировании компонента
+onMounted(async () => {
+  try {
+    const data = await expeditionsApi.getAll()
+    expeditions.value = data
+    console.log('Загруженные экспедиции:', data)
+  } catch (error) {
+    console.error('Ошибка при загрузке экспедиций:', error)
+  }
+})
 
 const selectExpedition = (expedition) => {
   currentExpedition.value = expedition

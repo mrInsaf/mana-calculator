@@ -43,6 +43,7 @@ import GrimuarContent from '../components/GrimuarContent.vue'
 
 const isLoaded = ref(false)
 const isMaster = ref(true)
+const isModalOpen = ref(false)
 
 onMounted(() => {
   setTimeout(() => {
