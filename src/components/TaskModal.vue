@@ -199,7 +199,7 @@ textarea.input-field {
 
 .table-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 0.7fr 0.7fr 0.7fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
   gap: 0.5rem;
   padding: 1rem;
   background: var(--primary-color);
@@ -210,7 +210,7 @@ textarea.input-field {
 
 .table-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 0.7fr 0.7fr 0.7fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
   gap: 0.5rem;
   padding: 0.5rem;
   border-bottom: 1px solid rgba(139, 111, 255, 0.2);
@@ -228,8 +228,6 @@ textarea.input-field {
 
 .subtask-input.number {
   text-align: center;
-  width: 100%;
-  min-width: 0;
 }
 
 .subtask-select {

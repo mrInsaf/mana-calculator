@@ -40,28 +40,15 @@
 import { ref, onMounted, provide } from 'vue'
 import ExpeditionContent from '../components/ExpeditionContent.vue'
 import GrimuarContent from '../components/GrimuarContent.vue'
-import { updateUserRole } from '../api'
 
 const isLoaded = ref(false)
 const isMaster = ref(true)
 const isModalOpen = ref(false)
-const isLibrarian = ref(false)
-const isLoading = ref(true)
-
-const toggleMode = () => {
-  isMaster.value = !isMaster.value
-  updateUserRole(!isMaster.value)
-}
 
 onMounted(() => {
   setTimeout(() => {
     isLoaded.value = true
   }, 100)
-  setTimeout(() => {
-    isLoading.value = false
-  }, 1000)
-  // Устанавливаем начальную роль
-  updateUserRole(!isMaster.value)
 })
 
 // Обработчик события открытия/закрытия модального окна

@@ -7,6 +7,12 @@ export const expeditionsApi = {
   getAll: () => api.get('/expeditions'),
 
   /**
+   * Получить бэклог задач
+   * @returns {Promise<Array>} Массив задач из бэклога
+   */
+  getBacklog: () => api.get('/backlog'),
+
+  /**
    * Получить экспедицию по ID
    * @param {number} id - ID экспедиции
    */
