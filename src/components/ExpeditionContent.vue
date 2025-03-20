@@ -80,6 +80,7 @@ import { ref, inject, onMounted } from 'vue'
 import TaskCard from './TaskCard.vue'
 import TaskModal from './TaskModal.vue'
 import { expeditionsApi } from '../api/expeditions'
+import { tasksApi } from '../api/tasks'
 
 const currentExpedition = ref(null)
 const expeditions = ref([])
@@ -96,8 +97,15 @@ onMounted(async () => {
   }
 })
 
-const selectExpedition = (expedition) => {
+const selectExpedition = async (expedition) => {
   currentExpedition.value = expedition
+  try {
+    const tasks = await expeditionsApi.getTasks(expedition.id)
+    currentExpedition.value.tasks = tasks
+    console.log('Загруженные задачи:', tasks)
+  } catch (error) {
+    console.error('Ошибка при загрузке задач:', error)
+  }
 }
 
 const createExpedition = () => {
@@ -111,13 +119,18 @@ const createExpedition = () => {
   currentExpedition.value = newExpedition
 }
 
-const deleteExpedition = () => {
+const deleteExpedition = async () => {
   if (!currentExpedition.value) return
   
-  const index = expeditions.value.findIndex(e => e.id === currentExpedition.value.id)
-  if (index !== -1) {
-    expeditions.value.splice(index, 1)
-    currentExpedition.value = expeditions.value[0] || null
+  try {
+    await expeditionsApi.delete(currentExpedition.value.id)
+    const index = expeditions.value.findIndex(e => e.id === currentExpedition.value.id)
+    if (index !== -1) {
+      expeditions.value.splice(index, 1)
+      currentExpedition.value = expeditions.value[0] || null
+    }
+  } catch (error) {
+    console.error('Ошибка при удалении экспедиции:', error)
   }
 }
 
@@ -125,24 +138,34 @@ const addTask = () => {
   isModalOpen.value = true
 }
 
-const handleTaskSave = (taskData) => {
+const handleTaskSave = async (taskData) => {
   if (!currentExpedition.value) return
 
-  const newTask = {
-    id: currentExpedition.value.tasks.length + 1,
-    title: taskData.title,
-    description: taskData.description,
-    subtasks: taskData.subtasks
+  try {
+    const newTask = {
+      ...taskData,
+      expeditionId: currentExpedition.value.id
+    }
+    const savedTask = await tasksApi.create(newTask)
+    currentExpedition.value.tasks.push(savedTask)
+  } catch (error) {
+    console.error('Ошибка при сохранении задачи:', error)
   }
-  currentExpedition.value.tasks.push(newTask)
 }
 
 const editTask = (task) => {
   // TODO: Implement task editing
 }
 
-const saveExpedition = () => {
-  // TODO: Implement expedition saving
+const saveExpedition = async () => {
+  if (!currentExpedition.value) return
+
+  try {
+    await expeditionsApi.update(currentExpedition.value.id, currentExpedition.value)
+    console.log('Экспедиция сохранена')
+  } catch (error) {
+    console.error('Ошибка при сохранении экспедиции:', error)
+  }
 }
 </script>
 
